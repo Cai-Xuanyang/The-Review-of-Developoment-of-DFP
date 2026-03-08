@@ -1,0 +1,90 @@
+name: LaTeX CI and Spell Check
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  # --- 任务 1: 编译 LaTeX 生成 PDF ---
+  build_pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Compile LaTeX
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: Cai_Xuanyang_The_Development_of_DFP.tex  # <--- 确保这里文件名和你的一致
+          compiler: xelatex  # 如果你的论文需要中文，通常用 xelatex；纯英文可用 pdflatex
+          args: "-interaction=nonstopmode"
+
+      - name: Upload PDF Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-paper
+          path: |
+            Cai_Xuanyang_The_Development_of_DFP.pdf  # <--- 确保输出文件名一致
+          retention-days: 30 # 保存30天
+
+  # --- 任务 2: 拼写检查 (Spell Check) ---
+  spell_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install pyspelling and dependencies
+        run: |
+          pip install pyspelling
+          # 安装 hunspell 字典 (可选，用于更准确的检查)
+          sudo apt-get update
+          sudo apt-get install -y hunspell-en-us
+
+      - name: Create Spell Check Config
+        run: |
+          cat > .spelling.yml <<EOF
+          matrix:
+          - name: Markdown and Text
+            sources:
+            - '**/*.md'
+            - '**/*.txt'
+            - '**/*.tex'  # 检查 tex 文件中的文本
+            dictionary:
+              wordlists:
+              - .wordlist.txt
+              output: .wordlist.dic
+            pipeline:
+            - pyspelling.filters.context:
+                context_visible_first: true
+                delimiters:
+                - open: '\\begin\{.*?\}'
+                  close: '\\end\{.*?\}'
+                - open: '\\[a-zA-Z]+\*?\{[^}]*\}' # 忽略带参数的命令
+                - open: '\\[a-zA-Z]+\*?\[[^\]]*\]\{[^}]*\}'
+                - open: '\$'
+                  close: '\$'
+                - open: '\$\$'
+                  close: '\$\$'
+          EOF
+
+      - name: Create Default Wordlist (Optional)
+        run: |
+          # 创建一个空的自定义词表，防止报错。
+          # 你可以在本地创建 .wordlist.txt 添加专业术语（如 "DFP", "Xuanyang"）
+          echo "DFP" > .wordlist.txt
+          echo "Xuanyang" >> .wordlist.txt
+          echo "LaTeX" >> .wordlist.txt
+
+      - name: Run Spell Check
+        run: |
+          pyspelling -c .spelling.yml
+        continue-on-error: true # 即使有拼写错误也让流程继续，方便你看到报告
+        # 如果你想让拼写错误导致构建失败（变红），去掉上面这行
