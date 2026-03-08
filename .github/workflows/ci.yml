@@ -49,11 +49,11 @@ jobs:
           sudo apt-get install -y aspell aspell-en
           # sudo apt-get install -y hunspell-en-us
 
-      - name: Create Spell Check Config
+            - name: Create Spell Check Config
         run: |
           cat > .spelling.yml <<EOF
           matrix:
-          - name: Markdown and Text
+          - name: LaTeX and Text
             sources:
             - '**/*.md'
             - '**/*.txt'
@@ -65,15 +65,15 @@ jobs:
             pipeline:
             - pyspelling.filters.context:
                 context_visible_first: true
-                delimiters:
-                - open: '\\begin\{.*?\}'
-                  close: '\\end\{.*?\}'
-                - open: '\\[a-zA-Z]+\*?\{[^}]*\}' 
-                - open: '\\[a-zA-Z]+\*?\[[^\]]*\]\{[^}]*\}'
-                - open: '\$'
-                  close: '\$'
-                - open: '\$\$'
-                  close: '\$\$'
+                delimiters
+                - open: '\\\\begin\\{.*?\\}'
+                  close: '\\\\end\\{.*?\\}'
+                - open: '\\\\[a-zA-Z]+\\*?\\{[^}]*\\}'
+                - open: '\\\\[a-zA-Z]+\\*?\\[[^\\]]*\\]\\{[^}]*\\}'
+                - open: '\\$'
+                  close: '\\$'
+                - open: '\\$\\$'
+                  close: '\\$\\$'
           EOF
 
       - name: Create Default Wordlist (Optional)
