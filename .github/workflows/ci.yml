@@ -51,31 +51,79 @@ jobs:
 
       - name: Create Spell Check Config
         run: |
-          cat > .spelling.yml <<EOF
-          matrix:
-          - name: LaTeX and Text
-            sources:
-            - '**/*.md'
-            - '**/*.txt'
-            - '**/*.tex'
-            dictionary:
-              wordlists:
-              - .wordlist.txt
-              output: .wordlist.dic
-            pipeline:
-            - pyspelling.filters.context:
-                context_visible_first: true
-                delimiters:
-                - open: '\\\\begin\\{.*?\\}'
-                  close: '\\\\end\\{.*?\\}'
-                - open: '\\$'
-                  close: '\\$'
-                - open: '\\$\\$'
-                  close: '\\$\\$'
-                - open: '\\\\\\['
-                  close: '\\\\\\]'
+          cat > .wordlist.txt <<EOF
+          Cai
+          Xuanyang
+          DFP
+          BFGS
+          Nocedal
+          Broyden
+          Davidon
+          Shanno
+          Powell
+          Zoutendijk
+          Armijo
+          Wolfe
+          Fukushima
+          Nishihara
+          Moritz
+          Yaxiang
+          Dai
+          Hessian
+          Hessians
+          Nonconvex
+          Nonconvexity
+          Subsampling
+          Superlinear
+          Minimality
+          Boundedness
+          AISTATS
+          SciPy
+          TeXbook
+          GitHub
+          arXiv
+          LaTeX
+          BibTeX
           EOF
 
+          cat > .spelling.yml <<EOF
+          matrix:
+            - name: LaTeX Documents
+              sources:
+                - '**/*.tex'
+              dictionary:
+                wordlists:
+                  - .wordlist.txt
+                output: .wordlist.dic
+              pipeline:
+                - pyspelling.filters.latex:
+                    ignore_comments: true
+                - pyspelling.filters.context:
+                    context_visible_first: true
+                    delimiters:
+                      - open: '\\\\begin\\{equation\\}'
+                        close: '\\\\end\\{equation\\}'
+                      - open: '\\\\begin\\{align\\}'
+                        close: '\\\\end\\{align\\}'
+                      - open: '\\$\\$'
+                        close: '\\$\\$'
+            - name: Markdown and Text
+              sources:
+                - '**/*.md'
+                - '**/*.txt'
+              dictionary:
+                wordlists:
+                  - .wordlist.txt
+                output: .wordlist.dic
+              pipeline:
+                - pyspelling.filters.context:
+                    context_visible_first: true
+                    delimiters:
+                      - open: '`'
+                        close: '`'
+                      - open: '```'
+                        close: '```'
+          EOF
       - name: Create Default Wordlist (Optional)
         run: |
           echo "DFP" > .wordlist.txt
