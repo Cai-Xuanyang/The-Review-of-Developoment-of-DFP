@@ -7,7 +7,6 @@ on:
     branches: [ main, master ]
 
 jobs:
-  # --- 任务 1: 编译 LaTeX 生成 PDF ---
   build_pdf:
     runs-on: ubuntu-latest
     steps:
@@ -17,8 +16,8 @@ jobs:
       - name: Compile LaTeX
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: Cai_Xuanyang_The_Development_of_DFP.tex  # <--- 确保这里文件名和你的一致
-          compiler: xelatex  # 如果你的论文需要中文，通常用 xelatex；纯英文可用 pdflatex
+          root_file: Cai_Xuanyang_The_Development_of_DFP.tex 
+          compiler: xelatex  
           args: "-interaction=nonstopmode"
 
       - name: Upload PDF Artifact
@@ -26,10 +25,9 @@ jobs:
         with:
           name: compiled-paper
           path: |
-            Cai_Xuanyang_The_Development_of_DFP.pdf  # <--- 确保输出文件名一致
-          retention-days: 30 # 保存30天
+            Cai_Xuanyang_The_Development_of_DFP.pdf  
+          retention-days: 30 
 
-  # --- 任务 2: 拼写检查 (Spell Check) ---
   spell_check:
     runs-on: ubuntu-latest
     steps:
@@ -43,10 +41,13 @@ jobs:
 
       - name: Install pyspelling and dependencies
         run: |
+          echo "Installing pyspelling..."
           pip install pyspelling
-          # 安装 hunspell 字典 (可选，用于更准确的检查)
+          
+          echo "Installing aspell and dictionaries..."
           sudo apt-get update
-          sudo apt-get install -y hunspell-en-us
+          sudo apt-get install -y aspell aspell-en
+          # sudo apt-get install -y hunspell-en-us
 
       - name: Create Spell Check Config
         run: |
@@ -56,7 +57,7 @@ jobs:
             sources:
             - '**/*.md'
             - '**/*.txt'
-            - '**/*.tex'  # 检查 tex 文件中的文本
+            - '**/*.tex'  
             dictionary:
               wordlists:
               - .wordlist.txt
@@ -67,7 +68,7 @@ jobs:
                 delimiters:
                 - open: '\\begin\{.*?\}'
                   close: '\\end\{.*?\}'
-                - open: '\\[a-zA-Z]+\*?\{[^}]*\}' # 忽略带参数的命令
+                - open: '\\[a-zA-Z]+\*?\{[^}]*\}' 
                 - open: '\\[a-zA-Z]+\*?\[[^\]]*\]\{[^}]*\}'
                 - open: '\$'
                   close: '\$'
@@ -77,8 +78,6 @@ jobs:
 
       - name: Create Default Wordlist (Optional)
         run: |
-          # 创建一个空的自定义词表，防止报错。
-          # 你可以在本地创建 .wordlist.txt 添加专业术语（如 "DFP", "Xuanyang"）
           echo "DFP" > .wordlist.txt
           echo "Xuanyang" >> .wordlist.txt
           echo "LaTeX" >> .wordlist.txt
@@ -86,5 +85,4 @@ jobs:
       - name: Run Spell Check
         run: |
           pyspelling -c .spelling.yml
-        continue-on-error: true # 即使有拼写错误也让流程继续，方便你看到报告
-        # 如果你想让拼写错误导致构建失败（变红），去掉上面这行
+        continue-on-error: true 
