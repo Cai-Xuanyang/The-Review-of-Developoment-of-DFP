@@ -415,7 +415,7 @@ In the initial theoretical treatments, the assumption of exact line search simpl
     \HH_{k+1} = \HH_k - \frac{\HH_k \yy_k \yy_k^\trans \HH_k}{\yy_k^\trans \HH_k \yy_k} + \frac{\dd_k \dd_k^\trans}{\yy_k^\trans \dd_k},
     \label{eq:dfp_update}
 \end{equation}
-where $\dd_k = -\HH_k \ggg_k$ is the search direction, $\ggg_k = \nabla f(\xx_k)$, and $\yy_k = \ggg_{k+1} - \ggg_k$.
+where $\dd_k = -\HH_k \ggg_k$ is the search direction, set $\ggg_k = \nabla f(\xx_k)$and $\yy_k = \ggg_{k+1} - \ggg_k$.
 
 Under the assumption that $f$ is uniformly convex (i.e., there exist constants $0 < m \le M$ such that $m \II \preceq \nabla^2 f(\xx) \preceq M \II$ for all $\xx$) and that $\alpha_k$ minimizes $f(\xx_k + \alpha \dd_k)$, Powell (1971) proved that:
 \begin{enumerate}
@@ -498,8 +498,8 @@ This function has several critical properties:
 \end{enumerate}
 
 \subsubsection{Derivation of the Recursive Inequality}
-The core of Yuan's proof \cite{yuan1995} involves analyzing the change in the potential function \\
-$\Delta \phi_k = \phi(\HH_{k+1}) - \phi(\HH_k)$ after one DFP update. Let us denote $\tau_k = \yy_k^\trans \dd_k$ and $\delta_k = \yy_k^\trans \HH_k \yy_k$. Using the DFP update formula \eqref{eq:dfp_update}, one can derive exact expressions for the trace and determinant updates:
+The core of Yuan's proof \cite{yuan1995} involves analyzing the change in the potential function 
+that $\Delta \phi_k = \phi(\HH_{k+1}) - \phi(\HH_k)$ after one DFP update. Let us denote $\tau_k = \yy_k^\trans \dd_k$ and $\delta_k = \yy_k^\trans \HH_k \yy_k$. Using the DFP update formula \eqref{eq:dfp_update}, one can derive exact expressions for the trace and determinant updates:
 \begin{align}
     \tr(\HH_{k+1}) &= \tr(\HH_k) - \frac{\|\HH_k \yy_k\|^2}{\delta_k} + \frac{\|\dd_k\|^2}{\tau_k}, \label{eq:trace_update} \\
     \det(\HH_{k+1}) &= \det(\HH_k) \cdot \frac{\tau_k}{\delta_k}. \label{eq:det_update}
@@ -521,7 +521,7 @@ Crucially, the curvature condition \eqref{eq:wolfe_curvature} implies:
 \end{equation}
 By performing a careful algebraic manipulation (see Yuan 1995 \cite{yuan1995} for full details), one can show that there exist constants $C_1, C_2 > 0$ depending only on $m, M, c_1, c_2$ such that:
 \begin{equation}
-    \Delta \phi_k \le C_1 - C_2 \frac{\|\ggg_k\|^2}{\ggg_k^\trans \HH_k \ggg_k}.
+    \Delta \phi_k \le C_1 - C_2 \dfrac{\|\ggg_k\|^2}{\ggg_k^trans \HH_k \ggg_k}.
     \label{eq:phi_inequality}
 \end{equation}
 Note that the term $\frac{\|\ggg_k\|^2}{\ggg_k^\trans \HH_k \ggg_k}$ is related to the cosine of the angle between the gradient and the search direction, scaled by the conditioning of $\HH_k$.
