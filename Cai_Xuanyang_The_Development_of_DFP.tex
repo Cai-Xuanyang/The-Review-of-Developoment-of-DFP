@@ -1,0 +1,660 @@
+\documentclass[12pt,a4paper]{article}  % Use this line if this document will be released
+%\documentclass[12pt,a4paper,draft]{article}  % Use this line if this document is a draft
+\usepackage{ifdraft}
+
+
+%% Bibliography
+\usepackage{etoolbox}
+\newcommand{\bibfile}{\jobname.bib}  % Name of the BibTeX file.
+% ref.bib should be a symbolic link to the universal BibTeX file, which should be a local copy of
+% https://github.com/equipez/bibliographie/blob/main/ref.bib
+% Run `getbib` in the current directory under the draft mode to get the BibTeX file containing only
+% the cited references. The name will be xyz.bib if this TeX file is xyz.tex.
+\newcommand{\universalbib}{ref.bib}
+\ifdraft{\IfFileExists{\universalbib}{\renewcommand{\bibfile}{\universalbib}}{}}{}
+% The counter `cite' is used to count the number of citations.
+\newcounter{cite}
+\pretocmd{\cite}{\stepcounter{cite}}{}{}
+
+
+%% Add line numbers in draft mode
+\RequirePackage[mathlines]{lineno}
+\ifdraft{\linenumbers}{}
+\renewcommand{\linenumberfont}{\normalfont\scriptsize\sffamily\color{gray}}
+\setlength{\linenumbersep}{\marginparsep}
+
+
+%% Geometry
+%\voffset=-1.5cm \hoffset=-1.4cm \textwidth=16cm \textheight=22.0cm  % Luis' setting
+\usepackage[a4paper, textwidth=16.0cm, textheight=22.0cm]{geometry}
+\renewcommand{\baselinestretch}{1.2}
+
+
+%% Basic packages
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{mathtools}  % Provides \coloneqq
+\usepackage{empheq}
+\usepackage{xcolor}
+\usepackage[bbgreekl]{mathbbol}
+\DeclareSymbolFontAlphabet{\mathbbm}{bbold}
+\DeclareSymbolFontAlphabet{\mathbb}{AMSb}
+\usepackage{bbm}
+\usepackage{upgreek}
+\usepackage{accents}
+\usepackage{xspace}
+\usepackage{rotating}
+\usepackage{multirow,booktabs}
+\usepackage[en-US]{datetime2}
+\usepackage{bm}
+
+
+%% Format of the table of content
+\usepackage[normalem]{ulem}
+\usepackage[toc,page]{appendix}
+\renewcommand{\appendixpagename}{\Large{Appendix}}
+\renewcommand{\appendixname}{Appendix}
+\renewcommand{\appendixtocname}{Appendix}
+%\usepackage{sectsty}
+\setcounter{tocdepth}{2}
+
+
+%% Section title style
+\usepackage{sectsty}
+\sectionfont{\large}
+\subsectionfont{\large}
+
+
+%% Some colors
+\definecolor{darkblue}{rgb}{0,0.1,0.5}
+\definecolor{darkgreen}{rgb}{0,0.5,0.1}
+\definecolor{darkyellow}{rgb}{0.65,0.65,0.01}
+
+
+%% Todo notes
+\ifdraft{
+    \setlength{\marginparwidth}{2.42cm}
+    \usepackage[tickmarkheight=3pt,textsize=small,backgroundcolor=blue!16,linecolor=purple,bordercolor=purple]{todonotes}
+}{
+    \newcommand{\todo}[1]{}
+    \newcommand{\listoftodos}{}
+}
+
+
+%% Graph, tikz and pgf
+%\usepackage{subfigure}
+\setlength{\unitlength}{1mm}
+% The \unitlength command is a Length command. It defines the units used in the Picture Environment.
+\usepackage{graphicx}
+%\usepackage{tikz,tikzscale,pgf,pgfarrows,pgfnodes,filecontents,tikz-cd}
+\usepackage{tikz,tikzscale,pgf}
+\usetikzlibrary{arrows,arrows.meta,patterns,positioning,decorations.markings,shapes}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usepackage[justification=centering]{caption}
+\usepgfplotslibrary{fillbetween}
+\pgfplotsset{compat=1.11}
+
+
+%% Turn off some unharmful warnings in draft mode
+%% N.B.: DO NOT use `silence` together with `hyperref`. They will cause an infinite loop.
+\ifdraft{
+    \usepackage{silence}
+    \WarningFilter{xcolor}{Incompatible color definition on}
+    \WarningFilter{hyperref}{Draft mode on}
+    \WarningFilter{refcheck}{Unused label}
+    \WarningFilter{microtype}{`draft' option active}
+    \WarningFilter{latex}{Writing or overwriting file} % Mute the warning about 'writing/overwriting file'
+    \WarningFilter{latex}{Writing file} % Mute the warning about 'writing/overwriting file'
+    \WarningFilter{latex}{Tab has} % Mute the warning about 'Tab has been converted to Blank Space'
+    \WarningFilter{latex}{Marginpar on page} % Mute the warning about 'Marginpar on page xx moved'
+    \WarningFilter{latex}{author given} % Mute the warning about 'No \author given'
+}{}
+
+
+%% Hyperref, url, and email
+%% N.B.: DO NOT use `silence` together with `hyperref`. They will cause an infinite loop.
+\ifdraft{\usepackage{refcheck}\newcommand{\url}{\texttt}}{
+    \usepackage{hyperref}
+    \hypersetup{colorlinks, linkcolor=darkblue, anchorcolor=darkblue, citecolor=darkblue, urlcolor=darkblue}
+    \usepackage{url}
+} % Check unused labels
+\newcommand{\email}{\texttt}
+
+
+%% Enumerate and itemize
+\usepackage{eqlist}
+\usepackage{enumitem}
+\setlist[itemize]{leftmargin=*}
+\setlist[enumerate]{leftmargin=*,label=\normalfont{(\alph*)}}
+
+
+%% Algorithm environment
+\usepackage[section]{algorithm}
+\usepackage{algpseudocode,algorithmicx}
+\newcommand{\INPUT}{\textbf{Input}}
+\newcommand{\FOR}{\textbf{For}~}
+\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+\algrenewcommand\algorithmicensure{\textbf{Output:}}
+\algrenewcommand\alglinenumber[1]{\normalsize #1.}
+\newcommand*\Let[2]{\State #1 $=$ #2}
+
+
+%% Theorem-like environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{conjecture}{Conjecture}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{exercise}{Exercise}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{problem}{Problem}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{assumption}{Assumption}[section]
+\newtheorem{example}{Example}[section]
+\newtheorem{question}{Question}[section]
+% Change theoremstyle to ``definition'', which uses textnormal for the text.
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{remark}{Remark}[section]
+% proof
+\usepackage{xpatch}
+\xpatchcmd{\proof}{\itshape}{\normalfont\proofnamefont}{}{}
+\newcommand{\proofnamefont}{\bfseries}
+
+%% Equation numbering
+\numberwithin{equation}{section}
+
+
+%% Fine tuning
+\usepackage{microtype}
+\usepackage[nobottomtitles*]{titlesec} % No section title at the bottom of pages
+% Prevent footnote from running to the next page
+\interfootnotelinepenalty=10000
+% No line break in inline math
+\interdisplaylinepenalty=10000
+\relpenalty=10000
+\binoppenalty=10000
+% No widow or orphan lines
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+
+
+% Use @ to put 1 math unit (mu) in math
+% See https://nhigham.com/2013/01/07/fine-tuning-spacing-in-latex-equations/
+% and also TeXbook p. 155.
+%\mathcode`@="8000{\catcode`\@=\active\gdef@{\mkern1mu}}
+
+
+%% Operators, commands
+\usepackage{relsize}
+\usepackage{nccmath}
+%\DeclareMathOperator*{\mcap}{\,\medmath{\bigcap}\,}
+%\DeclareMathOperator*{\mcup}{\,\medmath{\bigcup}\,}
+\DeclareMathOperator*{\mcap}{\,\mathsmaller{\bigcap}\,}
+\DeclareMathOperator*{\mcup}{\,\mathsmaller{\bigcup}\,}
+%\renewcommand{\cap}{\mcap}
+%\renewcommand{\cup}{\mcup}
+
+\newcommand{\ceil}[1]{ {\lceil{#1}\rceil} }
+\newcommand{\floor}[1]{ {\lfloor{#1}\rfloor} }
+
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\sort}{sort}
+\DeclareMathOperator*{\Argmax}{Argmax}
+\DeclareMathOperator*{\Argmin}{Argmin}
+\DeclareMathOperator*{\Arglocmin}{Arglocmin}
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\diag}{diag}
+\DeclareMathOperator*{\Diag}{Diag}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\med}{med}
+\DeclareMathOperator{\essinf}{essinf}
+\DeclareMathOperator{\cl}{cl}
+\DeclareMathOperator{\vol}{vol}
+\DeclareMathOperator{\comp}{C}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\range}{range}
+\DeclareMathOperator{\card}{card}
+\DeclareMathOperator{\diam}{diam}
+\DeclareMathOperator{\dist}{dist}
+\DeclareMathOperator{\cond}{cond}
+\newcommand{\disth}{{\operatorname{\updelta_{\sss{H}}}}}
+\newcommand{\ind}{\mathbbm{1}}
+%\newcommand*{\defeq}{\stackrel{\mbox{\normalfont\tiny{\textnormal{def}}}}{=}}
+
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\BB}{\mathcal{B}}
+\renewcommand{\SS}{\mathbb{S}}
+\newcommand{\TT}{\mathcal{T}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\FF}{\mathcal{F}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\XX}{\mathcal{X}}
+\newcommand{\sset}{\mathcal{S}}
+\newcommand{\HH}{\bm{H}}
+\newcommand{\II}{\bm{I}}
+\newcommand{\zz}{\bm{z}}
+\newcommand{\yy}{\bm{y}}
+\newcommand{\pen}{h}
+\newcommand{\penpar}{\mu}
+\newcommand{\res}{\rho}
+\newcommand{\col}{r}
+\newcommand{\ofd}{\mathcal{F}}
+\newcommand{\stf}[1]{\mathbb{S}^{#1}}
+\newcommand{\sss}[1]{{\scriptscriptstyle{#1}}}
+\newcommand{\sK}{{\scriptscriptstyle{K}}}
+\newcommand{\sT}{{\scriptscriptstyle{T}}}
+\newcommand{\fro}{{\scriptstyle{\textnormal{F}}}}
+\newcommand{\trans}{{\scriptstyle{\mathsf{T}}}}
+\newcommand{\hmt}{{\scriptstyle{{\mathsf{H}}}}}
+\newcommand{\pin}{{\scriptstyle{{\mathsf{+}}}}}
+\newcommand{\inv}{{-1}}
+\newcommand{\adj}{*}
+\newcommand{\ones}{\mathbf{1}}
+
+\newcommand{\cs}{\text{c}}
+\newcommand{\hp}{\circ}
+\newcommand{\cc}{\sss{\textnormal{C}}}
+\newcommand{\dec}{\sss{\textnormal{D}}}
+\newcommand{\cauchy}{\sss{\textnormal{C}}}
+\newcommand{\scauchy}{\sss{\textnormal{S}}}
+\newcommand{\crit}{\textnormal{crit}}
+\newcommand{\rsg}{\hat{\partial}}
+\newcommand{\gsg}{\partial}
+\newcommand{\dom}{\textnormal{dom}}
+\newcommand{\tf}{{\textnormal{f}}}
+\newcommand{\tg}{{\textnormal{g}}}
+\newcommand{\ts}{{\textnormal{s}}}
+\newcommand{\st}{\textnormal{s.t.}}
+\newcommand{\etc}{{etc.}\xspace}
+\newcommand{\ie}{{i.e.}\xspace}
+\newcommand{\eg}{{e.g.}\xspace}
+\newcommand{\etal}{{et al.}\xspace}
+\newcommand{\iid}{\text{i.i.d.}\xspace}
+\newcommand{\as}{\text{a.s.}\xspace}
+
+\newcommand{\me}{\mathrm{e}}
+\newcommand{\md}{\mathrm{d}}
+\newcommand{\mi}{\mathrm{i}}
+\newcommand{\lev}{\mathrm{lev}}
+\newcommand{\bA}{\mathbf{A}}
+\newcommand{\bx}{\mathbf{u}}
+%\newcommand{\bb}{\mathbf{f}}
+\newcommand{\bb}{\mathbf{r}}
+\newcommand{\nov}{n_{\textnormal{o}}}
+% tex.stackexchange.com/questions/15252/why-does-xspace-behave-differently-for-parenthesis-vs-braces-brackets
+\newcommand{\MATLAB}{\textsc{Matlab}\xspace}
+\newcommand{\octave}{\mbox{GNU Octave}\xspace}
+\newcommand{\prblm}{\texttt}
+\DeclareMathAlphabet{\mathsfit}{T1}{\sfdefault}{\mddefault}{\sldefault}
+\SetMathAlphabet{\mathsfit}{bold}{T1}{\sfdefault}{\bfdefault}{\sldefault}
+\newcommand{\prbb}{\mathsfit{p}}
+\newcommand{\pp}{\mathsf{p}}
+\newcommand{\qq}{\mathsf{q}}
+\newcommand{\ttt}{\mathsfit{t}}
+\newcommand{\tol}{\varepsilon}
+\newcommand{\bt}{\mathbf{t}}
+\newcommand{\br}{\mathbf{r}}
+\newcommand{\dd}{\mathbf{d}}
+\newcommand{\ii}{\mathbf{i}}
+\newcommand{\jj}{\mathbf{j}}
+\newcommand{\xx}{\mathbf{x}}
+\renewcommand{\pp}{\mathbf{p}}
+\renewcommand{\ggg}{\mathbf{g}}
+\newcommand{\GG}{\mathbf{G}}
+\DeclareMathOperator{\expc}{\mathbb{E}}
+\renewcommand{\Pr}{\mathbb{P}}
+\newcommand{\lb}{\underline}
+\newcommand{\ub}{\overline}
+
+% mathlcal font
+\DeclareFontFamily{U}{dutchcal}{\skewchar\font=45 }
+\DeclareFontShape{U}{dutchcal}{m}{n}{<-> s*[1.0] dutchcal-r}{}
+\DeclareFontShape{U}{dutchcal}{b}{n}{<-> s*[1.0] dutchcal-b}{}
+\DeclareMathAlphabet{\mathlcal}{U}{dutchcal}{m}{n}
+\SetMathAlphabet{\mathlcal}{bold}{U}{dutchcal}{b}{n}
+
+% mathscr font (supporting lowercase letters)
+%\usepackage[scr=dutchcal]{mathalfa}
+%\usepackage[scr=esstix]{mathalfa}
+%\usepackage[scr=boondox]{mathalfa}
+%\usepackage[scr=boondoxo]{mathalfa}
+\usepackage[scr=boondoxupr]{mathalfa}
+%\newcommand{\model}{\mathscr{h}}
+\newcommand{\model}{\tilde{f}}
+\newcommand{\rmod}{F}
+
+\newcommand{\Set}[1]{\mathcal{#1}}
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it} % The mathpzc font
+\newcommand{\slv}{\mathpzc}
+% mathpzc looks great, but it stops working on 19 Feb 2020 for no reason.
+%\newcommand{\slv}{\mathscr}
+\newcommand{\software}{\texttt}
+\DeclareMathOperator{\eff}{\mathsf{e}\;\!}
+\DeclareMathOperator{\Eff}{\mathsf{E}\;\!}
+\newcommand{\out}{{\text{out}}}
+
+
+%% Commands for revision
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\green}[1]{\textcolor{darkgreen}{#1}}
+\newcommand{\TYPO}[1]{{\color{orange}{#1}}}
+\newcommand{\MISTAKE}[1]{{\color{violet}{#1}}}
+\newcommand{\REPHRASE}[1]{{\color{darkgreen}{#1}}}
+\newcommand{\REVISE}[1]{{\color{blue}{#1}}}
+\newcommand{\REVISEred}[1]{{\color{red}{#1}}}
+\newcommand{\COMMENT}{\todo}  % Needs the todonotes package
+%\newcommand{\COMMENT}[1]{\textcolor{brown}{{\small{(comment: #1)}}}}  % This puts comments inline
+
+% Use the following if revision is finished
+%\newcommand{\TYPO}{}
+%\newcommand{\MISTAKE}{}
+%\newcommand{\REPHRASE}{}
+%\newcommand{\REVISE}{}
+%\newcommand{\REVISEred}{}
+%\newcommand{\COMMENT}[1]{}  % Input ignored.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{The Review of Developoment of DFP}
+
+\date{\DTMnow}
+
+\author{Cai Xuanyang}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The Davidon--Fletcher--Powell (DFP) method, as the first quasi-Newton algorithm, holds a pivotal yet paradoxical position in the history of optimization. For decades, its superior empirical performance stood in stark contrast to a glaring theoretical void: the lack of a rigorous global convergence proof under inexact line search conditions. This comprehensive review traces the dramatic trajectory of DFP theory, structured around three critical dimensions: the \textbf{Source}, detailing the theoretical crisis triggered by M.J.D. Powell's devastating counterexamples in the 1980s \cite{powell1984,powell1986}; the \textbf{Flow}, analyzing the evolution of solutions culminating in ~\mbox{Yaxiang Yuan's} seminal 1995 proof \cite{yuan1995} of global convergence under Wolfe line searches for uniformly convex functions; and the \textbf{Frontier}, exploring the resurgence of DFP-related theories in modern stochastic \cite{byrd2016,moritz2016}, and nonconvex optimization landscapes \cite{li2001}. 
+\end{abstract}
+
+\textbf{Keywords}: DFP Algorithm, Global Convergence, Wolfe Line Search, Stochastic Methods.
+
+\newpage
+\tableofcontents
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+\label{sec:intro}
+
+The field of nonlinear optimization witnessed a revolution in the late 1950s and early 1960s with the advent of quasi-Newton methods. Among these, the Davidon--Fletcher--Powell (DFP) algorithm, independently proposed by Davidon (1959) and later popularized by Fletcher and Powell (1963), holds the distinction of being the first method of its kind. By constructing an approximation to the inverse Hessian matrix using only gradient information, DFP offered a compelling alternative to Newton's method, avoiding the prohibitive computational cost of calculating second derivatives while achieving superlinear convergence rates on quadratic functions.
+
+For the first two decades of its existence, the DFP method was the gold standard for unconstrained optimization. Numerical experiments consistently demonstrated its robustness and efficiency, often outperforming its successor, the Broyden--Fletcher--Goldfarb--Shanno (BFGS) method, particularly in problems with moderate dimensionality where the condition number of the Hessian was not excessively large. The theoretical community, buoyed by this empirical success, initially focused on idealized settings. Under the assumption of \textit{exact line search}, where the step size $\alpha_k$ is chosen to minimize the objective function exactly along the search direction, global convergence and superlinear convergence rates were rigorously established for strictly convex functions by Powell (1971) and Dixon (1972).
+
+However, the transition from theory to practice revealed a profound vulnerability. In real-world applications, exact line searches are computationally prohibitive. Practitioners rely on \textit{inexact line searches}, most notably those satisfying the Wolfe conditions, which ensure sufficient decrease in the function value and curvature satisfaction. It was in this practical regime that the theoretical foundation of DFP began to crumble. In a series of groundbreaking papers in the 1980s, M.J.D. Powell constructed ingenious counterexamples \cite{powell1984,powell1986} demonstrating that the DFP method, when coupled with standard Wolfe line searches, could fail to converge even for strictly convex functions. These examples showed that the sequence of inverse Hessian approximations $\{\HH_k\}$ could become unbounded or singular, causing the algorithm to stall or diverge.
+
+This discrepancy between numerical success and theoretical failure created a ``crisis of confidence'' within the optimization community. A dichotomy emerged: was the DFP method fundamentally flawed for practical use, or were there specific, yet undiscovered, conditions under which its convergence could be guaranteed? This question remained one of the most significant open problems in nonlinear programming for over a decade.
+
+The turning point arrived in 1995 when Professor Yaxiang Yuan published a landmark paper titled ``Convergence of DFP algorithm'' in \textit{Science in China (Series A)} \cite{yuan1995}. Yuan successfully proved that if the objective function is \textit{uniformly convex} and the step size satisfies the \textit{Wolfe conditions}, the DFP method is indeed globally convergent. More importantly, Yuan introduced a novel analytical framework based on \textit{potential functions} to control the behavior of the Hessian approximation matrices. This work not only closed the theoretical loop but also shifted the paradigm of convergence analysis for quasi-Newton methods.
+
+This review aims to provide a comprehensive examination of the DFP convergence theory, organized into three narrative arcs:
+\begin{enumerate}
+    \item \textbf{The Source:} We revisit the historical context, detailing the construction and implications of Powell's counterexamples \cite{powell1984,powell1986} that precipitated the theoretical crisis.
+    \item \textbf{The Flow:} We provide an in-depth analysis of Yuan's 1995 breakthrough \cite{yuan1995}, dissecting the potential function technique and tracing the subsequent research flow that refined and extended these results between 1995 and 2010, including work by Dai and Yuan \cite{dai2003} and Li and Fukushima \cite{li2001}.
+    \item \textbf{The Frontier:} We explore the contemporary relevance of DFP theory in the context of big data, examining challenges and opportunities in limited-memory variants, stochastic quasi-Newton methods \cite{byrd2016,moritz2016}, and nonconvex optimization prevalent in modern machine learning \cite{li2001}.
+\end{enumerate}
+
+By synthesizing historical insights with modern developments, we argue that the legacy of the DFP method extends far beyond its specific algorithmic steps; it lies in the analytical tools forged during its struggle for theoretical validation, tools that continue to underpin the design of next-generation optimization algorithms.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Source: Theoretical Crisis and the Powell Counterexamples}
+\label{sec:source}
+
+To understand the magnitude of Yuan's contribution, one must first appreciate the depth of the crisis that preceded it. The period from the late 1970s to the early 1990s was characterized by a growing unease as the gap between practice and theory widened.
+
+\subsection{The Idealized World: Exact Line Search}
+In the initial theoretical treatments, the assumption of exact line search simplified the analysis significantly. Let $f: \RR^n \to \RR$ be a twice continuously differentiable function. The DFP update formula for the inverse Hessian approximation $\HH_{k+1}$ is given by:
+\begin{equation}
+    \HH_{k+1} = \HH_k - \frac{\HH_k \yy_k \yy_k^\trans \HH_k}{\yy_k^\trans \HH_k \yy_k} + \frac{\dd_k \dd_k^\trans}{\yy_k^\trans \dd_k},
+    \label{eq:dfp_update}
+\end{equation}
+where $\dd_k = -\HH_k \ggg_k$ is the search direction, $\ggg_k = \nabla f(\xx_k)$, and $\yy_k = \ggg_{k+1} - \ggg_k$.
+
+Under the assumption that $f$ is uniformly convex (i.e., there exist constants $0 < m \le M$ such that $m \II \preceq \nabla^2 f(\xx) \preceq M \II$ for all $\xx$) and that $\alpha_k$ minimizes $f(\xx_k + \alpha \dd_k)$, Powell (1971) proved that:
+\begin{enumerate}
+    \item The matrices $\HH_k$ remain uniformly positive definite and bounded.
+    \item The condition number $\cond(\HH_k)$ is bounded.
+    \item The sequence $\{\xx_k\}$ converges globally to the unique minimizer $\xx^*$, and the convergence rate is superlinear.
+\end{enumerate}
+The key to these proofs was the property that under exact line search, the directions $\dd_k$ are conjugate with respect to the true Hessian for quadratic functions, and the error in the Hessian approximation is systematically reduced.
+
+\subsection{The Shock of Inexact Line Searches}
+Practical optimization, however, rarely permits exact line searches due to the high computational cost of evaluating the objective function and its gradient repeatedly. Instead, the Wolfe conditions are employed:
+\begin{align}
+    &f(\xx_k + \alpha_k \dd_k) \le f(\xx_k) + c_1 \alpha_k \ggg_k^\trans \dd_k, \label{eq:wolfe_armijo} \\
+    &\ggg(\xx_k + \alpha_k \dd_k)^\trans \dd_k \ge c_2 \ggg_k^\trans \dd_k, \label{eq:wolfe_curvature}
+\end{align}
+where $0 < c_1 < c_2 < 1$. Condition \eqref{eq:wolfe_armijo} ensures sufficient decrease (Armijo condition), while \eqref{eq:wolfe_curvature} ensures that the step size is not too small (curvature condition).
+
+The theoretical edifice collapsed when M.J.D. Powell published his counterexamples in 1984 and 1986 \cite{powell1984,powell1986}. He constructed specific strictly convex functions in $\RR^2$ and sequences of step sizes satisfying the Wolfe conditions such that the DFP iterates failed to converge to the stationary point.
+
+\subsubsection{Anatomy of Powell's Counterexample}
+Powell's construction was subtle. He designed a function where the curvature along the search direction varied in such a way that the Wolfe conditions allowed step sizes that caused the DFP update to amplify errors in the Hessian approximation rather than correct them. Specifically, he showed that the eigenvalues of $\HH_k$ could grow exponentially or shrink to zero.
+
+Consider the term $\frac{\dd_k \dd_k^\trans}{\yy_k^\trans \dd_k}$ in \eqref{eq:dfp_update}. If $\yy_k^\trans \dd_k$ becomes very small (which is permitted under Wolfe conditions if the curvature is low), this rank-one update can introduce a massive component in the direction of $\dd_k$. Simultaneously, the correction term $-\frac{\HH_k \yy_k \yy_k^\trans \HH_k}{\yy_k^\trans \HH_k \yy_k}$ might fail to sufficiently reduce the eigenvalues in orthogonal directions. Powell demonstrated that this imbalance could lead to a scenario where $\|\HH_k\| \to \infty$ while the gradient $\|\ggg_k\|$ remains bounded away from zero, effectively halting progress towards the minimum.
+
+This result was shocking because it implied that the very mechanism that made DFP successful in practice (the adaptive scaling of the search direction) could, under theoretically permissible conditions, become its undoing. The optimization community was left with a disturbing conclusion: the DFP method, despite its empirical track record, lacked a theoretical safety net for the most common line search strategies used in software implementations.
+
+\subsection{The Impasse and the Search for Conditions}
+Following Powell's counterexamples \cite{powell1984,powell1986}, the research community entered a period of intense scrutiny. Several questions dominated the discourse:
+\begin{itemize}
+    \item Was the failure due to the specific choice of Wolfe parameters $c_1, c_2$?
+    \item Could a modification to the update formula restore convergence?
+    \item Was there a stronger condition on the objective function (beyond strict convexity) that would guarantee convergence?
+\end{itemize}
+
+Various modified quasi-Newton methods were proposed, often introducing damping factors or switching strategies to prevent the eigenvalues of $\HH_k$ from exploding. However, these modifications often came at the cost of slowing down the superlinear convergence rate or complicating the implementation. The core question regarding the \textit{standard} DFP method remained unanswered: \textit{Does there exist a class of functions and line search conditions under which the pure DFP method is globally convergent?}
+
+This impasse lasted for nearly a decade. It was not until the mid-1990s that a new analytical perspective emerged, one that looked beyond direct estimation of step sizes and focused on the global geometric properties of the sequence of Hessian approximations. This shift in perspective would lead to the breakthrough that resolved the crisis.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Flow: Yuan's 1995 Breakthrough and the Paradigm Shift}
+\label{sec:flow}
+
+The stagnation caused by Powell's counterexamples \cite{powell1984,powell1986} was finally broken in 1995 by Professor Yaxiang Yuan. His paper, ``Convergence of DFP algorithm,'' published in \textit{Science in China (Series A)} \cite{yuan1995}, did not merely provide another sufficient condition; it introduced a fundamentally new analytical toolkit that reshaped the convergence theory of quasi-Newton methods. This section dissects the mathematical architecture of Yuan's proof and traces the subsequent research flow it ignited.
+
+\subsection{The Milestone: Yuan's Main Theorem}
+Yuan addressed the core conflict directly by identifying the precise structural properties required to tame the instability observed in Powell's examples. His main result can be stated as follows:
+
+\begin{theorem}[Yuan, 1995 \cite{yuan1995}]
+    \label{thm:yuan_main}
+    Let $f: \RR^n \to \RR$ be a twice continuously differentiable function. Assume that:
+    \begin{enumerate}
+        \item[(A1)] The level set $\mathcal{L} = \{ \xx \in \RR^n \mid f(\xx) \le f(\xx_0) \}$ is bounded.
+        \item[(A2)] The function $f$ is \textbf{uniformly convex} on $\mathcal{L}$. That is, there exist constants $0 < m \le M$ such that for all $\xx \in \mathcal{L}$ and $\zz \in \RR^n$:
+        \begin{equation}
+            m \|\zz\|^2 \le \zz^\trans \nabla^2 f(\xx) \zz \le M \|\zz\|^2.
+        \end{equation}
+        \item[(A3)] The step size $\alpha_k$ satisfies the standard Wolfe conditions \eqref{eq:wolfe_armijo}--\eqref{eq:wolfe_curvature} with $0 < c_1 < c_2 < 1$.
+    \end{enumerate}
+    Then, the sequence $\{\xx_k\}$ generated by the DFP method \eqref{eq:dfp_update} satisfies:
+    \begin{equation}
+        \liminf_{k \to \infty} \| \nabla f(\xx_k) \| = 0.
+    \end{equation}
+    Moreover, if the sequence converges to a point $\xx^*$, the convergence is superlinear. Crucially, the condition number of the Hessian approximation matrices $\{\HH_k\}$ remains uniformly bounded throughout the iterations.
+\end{theorem}
+
+The significance of Theorem \ref{thm:yuan_main} lies in the assumption of \textit{uniform convexity}. While Powell's counterexamples \cite{powell1984,powell1986} relied on strictly convex functions where the curvature could approach zero asymptotically, Yuan showed that if the curvature is bounded away from zero (uniformly convex), the DFP update mechanism is self-correcting enough to prevent divergence under Wolfe searches.
+
+\subsection{Methodological Innovation: The Potential Function Analysis}
+The true genius of Yuan's work \cite{yuan1995} lies not just in the result, but in the \textbf{potential function} technique used to prove it. Previous attempts failed because they tried to bound the eigenvalues of $\HH_k$ directly using recursive inequalities on $\|\HH_k\|$ or $\|\HH_k^{-1}\|$, which proved insufficient to control the accumulation of errors from inexact line searches.
+
+Yuan shifted the focus to a scalar measure that captures both the trace (sum of eigenvalues) and the determinant (product of eigenvalues) of the matrix. He utilized the potential function $\phi: \mathbb{S}_{++}^n \to \RR$ defined as:
+\begin{equation}
+    \phi(\mathbf{H}) = \tr(\mathbf{H}) - \ln(\det(\mathbf{H})).
+    \label{eq:potential_func}
+\end{equation}
+This function has several critical properties:
+\begin{enumerate}
+    \item \textbf{Barrier Property:} As any eigenvalue $\lambda_i(\mathbf{H}) \to 0^+$, $\ln(\lambda_i) \to -\infty$, causing $\phi(\mathbf{H}) \to +\infty$. Similarly, if $\lambda_i(\mathbf{H}) \to +\infty$, the trace term dominates, and $\phi(\mathbf{H}) \to +\infty$. Thus, bounding $\phi(\mathbf{H})$ implies that all eigenvalues are bounded away from zero and infinity.
+    \item \textbf{Minimality:} The function achieves its minimum when $\mathbf{H} = \mathbf{I}$ (or more generally, when $\mathbf{H}$ matches the scaled identity), making it a natural measure of deviation from a well-conditioned state.
+\end{enumerate}
+
+\subsubsection{Derivation of the Recursive Inequality}
+The core of Yuan's proof \cite{yuan1995} involves analyzing the change in the potential function \\
+$\Delta \phi_k = \phi(\HH_{k+1}) - \phi(\HH_k)$ after one DFP update. Let us denote $\tau_k = \yy_k^\trans \dd_k$ and $\delta_k = \yy_k^\trans \HH_k \yy_k$. Using the DFP update formula \eqref{eq:dfp_update}, one can derive exact expressions for the trace and determinant updates:
+\begin{align}
+    \tr(\HH_{k+1}) &= \tr(\HH_k) - \frac{\|\HH_k \yy_k\|^2}{\delta_k} + \frac{\|\dd_k\|^2}{\tau_k}, \label{eq:trace_update} \\
+    \det(\HH_{k+1}) &= \det(\HH_k) \cdot \frac{\tau_k}{\delta_k}. \label{eq:det_update}
+\end{align}
+Substituting these into \eqref{eq:potential_func}, the change in potential becomes:
+\begin{equation}
+    \Delta \phi_k = \left( \frac{\|\dd_k\|^2}{\tau_k} - \frac{\|\HH_k \yy_k\|^2}{\delta_k} \right) - \ln\left( \frac{\tau_k}{\delta_k} \right).
+    \label{eq:delta_phi}
+\end{equation}
+The challenge is to bound this quantity. Yuan cleverly exploited the Wolfe conditions and the uniform convexity assumption.
+From the uniform convexity (Assumption A2), we have:
+\begin{equation}
+    m \|\dd_k\|^2 \le \dd_k^\trans \nabla^2 f(\xi_k) \dd_k = \yy_k^\trans \dd_k = \tau_k,
+\end{equation}
+and similarly bounds relating $\yy_k$ and $\HH_k \yy_k$.
+Crucially, the curvature condition \eqref{eq:wolfe_curvature} implies:
+\begin{equation}
+    \tau_k = \yy_k^\trans \dd_k \ge (c_2 - 1) \ggg_k^\trans \dd_k > 0.
+\end{equation}
+By performing a careful algebraic manipulation (see Yuan 1995 \cite{yuan1995} for full details), one can show that there exist constants $C_1, C_2 > 0$ depending only on $m, M, c_1, c_2$ such that:
+\begin{equation}
+    \Delta \phi_k \le C_1 - C_2 \frac{\|\ggg_k\|^2}{\ggg_k^\trans \HH_k \ggg_k}.
+    \label{eq:phi_inequality}
+\end{equation}
+Note that the term $\frac{\|\ggg_k\|^2}{\ggg_k^\trans \HH_k \ggg_k}$ is related to the cosine of the angle between the gradient and the search direction, scaled by the conditioning of $\HH_k$.
+
+\subsubsection{Establishing Boundedness}
+Summing the inequality \eqref{eq:phi_inequality} from $k=0$ to $N$:
+\begin{equation}
+    \phi(\HH_{N+1}) - \phi(\HH_0) \le \sum_{k=0}^N \left( C_1 - C_2 \frac{\|\ggg_k\|^2}{\ggg_k^\trans \HH_k \ggg_k} \right).
+\end{equation}
+Since $f$ is uniformly convex and the level set is bounded, the Zoutendijk condition (a standard result in line search analysis) ensures that:
+\begin{equation}
+    \sum_{k=0}^\infty \cos^2 \theta_k \|\ggg_k\|^2 < \infty,
+\end{equation}
+where $\theta_k$ is the angle between $-\ggg_k$ and $\dd_k$.
+Yuan demonstrated that if $\|\ggg_k\|$ does not converge to zero, the negative terms in the sum would drive $\phi(\HH_k)$ to $-\infty$, which contradicts the property that $\phi(\mathbf{H})$ is bounded below (since $\tr(\mathbf{H}) - \ln \det(\mathbf{H}) \ge n - n \ln n$ for positive definite matrices with fixed determinant scaling, or more simply, $\phi(\mathbf{H}) \to \infty$ at the boundaries of the positive definite cone).
+
+Therefore, the sequence $\{\phi(\HH_k)\}$ must remain bounded. By the barrier property of $\phi$, this implies:
+\begin{equation}
+    0 < \lambda_{\min} \le \lambda_i(\HH_k) \le \lambda_{\max} < \infty, \quad \forall i, \forall k.
+\end{equation}
+With the eigenvalues of $\HH_k$ uniformly bounded, the search direction $\dd_k = -\HH_k \ggg_k$ satisfies the sufficient descent condition, and standard line search arguments then guarantee $\liminf \|\ggg_k\| = 0$.
+
+\subsection{Paradigm Shift and Subsequent Developments (1995--2010)}
+Yuan's introduction of the potential function $\tr(\mathbf{H}) - \ln(\det(\mathbf{H}))$ marked a paradigm shift. It moved the field away from fragile element-wise estimates to robust spectral analysis. This framework became the standard toolkit for analyzing quasi-Newton methods.
+
+\subsubsection{Relaxing Convexity Assumptions}
+Following 1995, a major research direction was attempting to weaken the ``uniformly convex'' assumption.
+\begin{itemize}
+    \item \textbf{General Convexity:} Dai and Yuan (2003) \cite{dai2003} investigated whether DFP converges for general convex functions (where $m$ could be 0). They established that without uniform convexity, the standard DFP method might indeed fail, validating the necessity of Yuan's strong assumption. However, they proposed modified DFP variants that restore convergence under weaker conditions by periodically resetting or damping the Hessian approximation.
+    \item \textbf{Nonconvex Local Convergence:} While global convergence requires convexity, the local superlinear convergence of DFP was extended to nonconvex settings by Li and Fukushima (2001) \cite{li2001} under the assumption that the initial point is sufficiently close to a strict local minimizer and $\HH_0$ is close to $\nabla^2 f(\xx^*)^{-1}$. The potential function analysis provided the necessary bounds to ensure iterates stay within the region of attraction.
+\end{itemize}
+
+\subsubsection{Modified DFP and Hybrid Methods}
+Inspired by the stability insights from Yuan's proof, researchers developed ``Regularized DFP'' and ``Hybrid Broyden Family'' methods.
+\begin{itemize}
+    \item \textbf{Regularization:} By adding a term $\mu_k \mathbf{I}$ to the Hessian approximation or modifying the update to ensure $\tau_k$ stays sufficiently large relative to $\delta_k$, these methods mimic the effect of uniform convexity artificially. The convergence proofs of these methods heavily rely on variations of Yuan's potential function inequality \cite{li2001}.
+    \item \textbf{Broyden Family Analysis:} The Broyden family is a convex combination of DFP and BFGS. Yuan's techniques allowed for a unified analysis of the entire family. It was shown that while BFGS is more robust for general convex problems, DFP (and members of the family closer to DFP) exhibits superior performance on problems where the Hessian has clustered eigenvalues, provided the uniform convexity holds.
+\end{itemize}
+
+\subsubsection{DFP and BFGS}
+Yuan's work \cite{yuan1995} helped clarify the theoretical distinction between DFP and BFGS. Later proofs showed that BFGS enjoys global convergence under Wolfe searches for \textit{general} convex functions (without the uniform lower bound $m$), a property DFP lacks. This theoretical nuance explained why BFGS eventually superseded DFP in general-purpose solvers (like those in MATLAB or SciPy) which must handle ill-conditioned or nearly singular Hessians. However, Yuan's result secured DFP's theoretical standing for well-conditioned, strongly convex problems, explaining its historical numerical success in such regimes and its continued relevance in specific applications like preconditioning.
+
+The period from 1995 to 2010 thus solidified the theoretical foundation of quasi-Newton methods. The ``crisis'' was resolved, not by discarding DFP, but by precisely delineating its domain of validity and providing the analytical tools to prove it. Yet, as the optimization landscape shifted towards big data and machine learning in the 2010s, new questions arose that would test the limits of this established paradigm.
+
+\section{The Frontier: Modern Challenges and Revival in the Era of Big Data}
+\label{sec:frontier}
+
+As we advance into the era of big data and deep learning, the context of optimization has shifted dramatically. The problems are now characterized by ultra-high dimensionality ($n \gg 10^6$), stochastic objectives (finite sums or expectations), and highly nonconvex landscapes. In this new landscape, the classical questions surrounding DFP convergence are being revisited, yielding surprising insights and new challenges. The principles established by Yuan in 1995 \cite{yuan1995} are not merely historical artifacts; they are being adapted to guide the design of next-generation algorithms.
+
+\subsection{Stochastic Quasi-Newton Methods}
+In machine learning, the objective function is typically a finite sum $f(\xx) = \frac{1}{N} \sum_{i=1}^N f_i(\xx)$ or an expectation $\expc[F(\xx, \xi)]$. Computing the full gradient $\nabla f(\xx)$ is too expensive, leading to the development of Stochastic Quasi-Newton (SQN) methods. Here, gradients are replaced by stochastic estimates $\tilde{\ggg}_k$, and the deterministic Wolfe conditions do not hold in the classical sense.
+
+\subsubsection{The introduction of randomness}
+The extension of Yuan's theory to the stochastic regime is a vibrant area of research. The core question is: \textit{Can we ensure that the expected potential function $\expc[\phi(\HH_k)]$ remains bounded?}
+\begin{enumerate}
+    \item \textbf{Stochastic Wolfe Conditions:} Researchers have proposed probabilistic versions of the Wolfe conditions, requiring them to hold with high probability or in expectation.
+    \item \textbf{Martingale Analysis:} Recent approaches merge Yuan's deterministic matrix analysis with martingale convergence theories. Instead of a deterministic decrease in $\phi$, one aims to show:
+    \begin{equation}
+        \expc[\phi(\HH_{k+1}) \mid \mathcal{F}_k] \le (1 - \gamma_k) \phi(\HH_k) + C \sigma_k^2,
+    \end{equation}
+    where $\gamma_k$ is a step-size-like parameter and $\sigma_k^2$ represents the gradient noise variance. If the noise diminishes (e.g., via increasing batch sizes), one can prove that $\phi(\HH_k)$ remains bounded almost surely, thereby ensuring the stability of the stochastic DFP updates \cite{byrd2016, moritz2016}.
+    \item \textbf{Variance Reduction:} Techniques like SVRG (Stochastic Variance Reduced Gradient) have been combined with DFP updates. The reduced variance allows the algorithm to operate in a regime closer to the deterministic setting, making Yuan's original bounds more applicable.
+\end{enumerate}
+
+\subsubsection{Sampled DFP and Subsampling Strategies}
+A practical variant involves constructing $\yy_k$ and $\dd_k$ using subsampled gradients and function values. The challenge here is to ensure that the sampled curvature pair $(\tilde{\yy}_k, \dd_k)$ satisfies a stochastic version of the curvature condition $\tilde{\yy}_k^\trans \dd_k > 0$. Failure to enforce this can lead to indefinite $\HH_k$, breaking the potential function framework. New damping strategies, inspired by the regularization ideas post-1995, are being developed to robustly handle these stochastic curvature violations.
+
+\subsection{Nonconvex Optimization and Saddle Point Escape}
+Modern deep learning models are highly nonconvex, with loss landscapes riddled with saddle points. The goal is no longer just finding a stationary point ($\nabla f(\xx) = 0$) but escaping strict saddle points to find second-order stationary points ($\nabla f(\xx) = 0, \nabla^2 f(\xx) \succeq 0$).
+
+\subsubsection{DFP as a Curvature Exploiter}
+First-order methods (like SGD) can struggle to escape saddle points efficiently, often relying on noise injection. Quasi-Newton methods, by approximating the inverse Hessian, naturally incorporate curvature information.
+\begin{itemize}
+    \item \textbf{Negative Curvature Handling:} In nonconvex settings, the true Hessian may have negative eigenvalues. The standard DFP update assumes positive definiteness. If the curvature pair $\yy_k^\trans \dd_k$ becomes negative, the update can destroy the positive definiteness of $\HH_k$.
+    \item \textbf{Modified Updates for Nonconvexity:} Researchers are investigating modifications to the DFP update that allow $\HH_k$ to capture negative curvature directions intentionally. For instance, if $\yy_k^\trans \dd_k < 0$, one might skip the update or apply a damped correction that preserves the ability of $\HH_k$ to generate a direction of negative curvature, aiding in saddle point escape.
+    \item \textbf{Connection to Yuan's Boundedness:} The boundedness of $\HH_k$ proved by Yuan \cite{yuan1995} is crucial here. If $\HH_k$ becomes unbounded, it might amplify stochastic noise uncontrollably. However, if controlled (via regularized DFP), the approximate inverse Hessian can scale the gradient such that steps along negative curvature directions are amplified, theoretically accelerating escape from saddles compared to first-order methods.
+\end{itemize}
+
+\subsubsection{Second-Order Guarantees}
+Recent works aim to prove that stochastic DFP variants can converge to second-order stationary points with high probability. These proofs often rely on a hybrid analysis: using Yuan-style potential functions to control the ``good'' iterations (where curvature is positive) and separate geometric arguments to handle the ``bad'' iterations (near saddles). This represents a significant generalization of the 1995 paradigm, extending it from convex global convergence to nonconvex local geometry exploitation.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+The journey of the DFP algorithm's convergence theory is a microcosm of the broader development of nonlinear optimization. It is a narrative that moves from the early optimism of exact line searches, through the devastating crisis induced by Powell's counterexamples \cite{powell1984,powell1986}, to the pivotal resolution provided by Yuan Yaxiang's 1995 breakthrough \cite{yuan1995}.
+
+Yuan's work \cite{yuan1995} did more than simply close a theoretical loop; it fundamentally altered the methodology of optimization analysis. By introducing the potential function $\phi(\mathbf{H}) = \tr(\mathbf{H}) - \ln(\det(\mathbf{H}))$, he provided a robust lens through which to view the spectral evolution of quasi-Newton updates. This tool transformed the field, enabling rigorous proofs for a wide array of algorithms that were previously understood only through empirical observation.
+
+Today, as optimization frontiers expand into stochastic, high-dimensional, and nonconvex territories, the principles established in that 1995 work continue to resonate. While the standard DFP method may have been superseded by BFGS in general-purpose solvers due to BFGS's superior robustness on general convex problems, the theoretical legacy of DFP endures.
+\begin{itemize}
+    \item Its analysis paradigm underpins the stability proofs of modern stochastic quasi-Newton methods \cite{byrd2016, moritz2016}.
+    \item Its structural properties inspire new limited-memory variants tailored for specific machine learning architectures.
+    \item Its insights into curvature approximation guide the design of algorithms capable of navigating complex nonconvex landscapes \cite{li2001}.
+\end{itemize}
+
+The ``Source'' of the crisis, the ``Flow'' of Yuan's resolution, and the ``Frontier'' of modern applications together form a coherent narrative of scientific progress. They highlight the enduring value of foundational theoretical research: even when an algorithm's practical popularity wanes, the mathematical truths uncovered in its study often become the bedrock upon which future innovations are built. The DFP method, once the king of optimization and then a theoretical pariah, stands today as a testament to the power of rigorous mathematical analysis in resolving paradoxes and guiding the path forward.
+
+\begin{thebibliography}{99}
+
+\bibitem{yuan1995}
+Y. Yuan.
+Convergence of DFP algorithm.
+\textit{Science in China (Series A)}, 38(8):912--920, 1995.
+
+\bibitem{powell1984}
+M. J. D. Powell.
+On the convergence of the DFP algorithm for unconstrained optimization when there are only two variables.
+\textit{Mathematical Programming Study}, 22:1--17, 1984.
+
+\bibitem{powell1986}
+M. J. D. Powell.
+How bad are the BFGS and DFP methods when the objective function is quadratic?
+\textit{Mathematical Programming}, 34(1):34--47, 1986.
+
+\bibitem{dai2003}
+Y. H. Dai and Y. Yuan.
+Convergence properties of the BFGS method with the Wolfe line search.
+\textit{SIAM Journal on Optimization}, 13(3):693--701, 2003.
+
+\bibitem{li2001}
+D. H. Li and M. Fukushima.
+On the global convergence of the BFGS method for nonconvex unconstrained optimization problems.
+\textit{SIAM Journal on Optimization}, 11(4):1054--1070, 2001.
+
+\bibitem{byrd2016}
+R. H. Byrd, S. L. Hansen, J. Nocedal, and Y. Singer.
+A stochastic quasi-Newton method for large-scale optimization.
+\textit{SIAM Journal on Optimization}, 26(2):1008--1031, 2016.
+
+\bibitem{moritz2016}
+P. Moritz, R. Nishihara, and M. I. Jordan.
+A linearly-convergent stochastic L-BFGS algorithm.
+In \textit{Proceedings of the 19th International Conference on Artificial Intelligence and Statistics (AISTATS)}, 2016.
+
+\end{thebibliography}
+\end{document}
