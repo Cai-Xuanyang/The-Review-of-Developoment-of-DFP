@@ -49,81 +49,64 @@ jobs:
           sudo apt-get install -y aspell aspell-en
           # sudo apt-get install -y hunspell-en-us
 
-      - name: Create Spell Check Config
+            - name: Create Spell Check Config
         run: |
-          cat > .wordlist.txt <<EOF
-          Cai
-          Xuanyang
-          DFP
-          BFGS
-          Nocedal
-          Broyden
-          Davidon
-          Shanno
-          Powell
-          Zoutendijk
-          Armijo
-          Wolfe
-          Fukushima
-          Nishihara
-          Moritz
-          Yaxiang
-          Dai
-          Hessian
-          Hessians
-          Nonconvex
-          Nonconvexity
-          Subsampling
-          Superlinear
-          Minimality
-          Boundedness
-          AISTATS
-          SciPy
-          TeXbook
-          GitHub
-          arXiv
-          LaTeX
-          BibTeX
-          EOF
+          echo "Cai" > .wordlist.txt
+          echo "Xuanyang" >> .wordlist.txt
+          echo "DFP" >> .wordlist.txt
+          echo "BFGS" >> .wordlist.txt
+          echo "Nocedal" >> .wordlist.txt
+          echo "Broyden" >> .wordlist.txt
+          echo "Davidon" >> .wordlist.txt
+          echo "Shanno" >> .wordlist.txt
+          echo "Powell" >> .wordlist.txt
+          echo "Zoutendijk" >> .wordlist.txt
+          echo "Armijo" >> .wordlist.txt
+          echo "Wolfe" >> .wordlist.txt
+          echo "Fukushima" >> .wordlist.txt
+          echo "Nishihara" >> .wordlist.txt
+          echo "Moritz" >> .wordlist.txt
+          echo "Yaxiang" >> .wordlist.txt
+          echo "Dai" >> .wordlist.txt
+          echo "Hessian" >> .wordlist.txt
+          echo "Hessians" >> .wordlist.txt
+          echo "Nonconvex" >> .wordlist.txt
+          echo "Nonconvexity" >> .wordlist.txt
+          echo "Subsampling" >> .wordlist.txt
+          echo "Superlinear" >> .wordlist.txt
+          echo "Minimality" >> .wordlist.txt
+          echo "Boundedness" >> .wordlist.txt
+          echo "AISTATS" >> .wordlist.txt
+          echo "SciPy" >> .wordlist.txt
+          echo "TeXbook" >> .wordlist.txt
+          echo "GitHub" >> .wordlist.txt
+          echo "arXiv" >> .wordlist.txt
+          echo "LaTeX" >> .wordlist.txt
+          echo "BibTeX" >> .wordlist.txt
 
-          cat > .spelling.yml <<EOF
-          matrix:
-            - name: LaTeX Documents
-              sources:
-                - '**/*.tex'
-              dictionary:
-                wordlists:
-                  - .wordlist.txt
-                output: .wordlist.dic
-              pipeline:
-                - pyspelling.filters.latex:
-                    ignore_comments: true
-                - pyspelling.filters.context:
-                    context_visible_first: true
-                    delimiters:
-                      - open: '\\\\begin\\{equation\\}'
-                        close: '\\\\end\\{equation\\}'
-                      - open: '\\\\begin\\{align\\}'
-                        close: '\\\\end\\{align\\}'
-                      - open: '\\$\\$'
-                        close: '\\$\\$'
-            - name: Markdown and Text
-              sources:
-                - '**/*.md'
-                - '**/*.txt'
-              dictionary:
-                wordlists:
-                  - .wordlist.txt
-                output: .wordlist.dic
-              pipeline:
-                - pyspelling.filters.context:
-                    context_visible_first: true
-                    delimiters:
-                      - open: '`'
-                        close: '`'
-                      - open: '```'
-                        close: '```'
-          EOF
+          echo "matrix:" > .spelling.yml
+          echo "  - name: LaTeX Check" >> .spelling.yml
+          echo "    sources:" >> .spelling.yml
+          echo "      - '**/*.tex'" >> .spelling.yml
+          echo "    dictionary:" >> .spelling.yml
+          echo "      wordlists:" >> .spelling.yml
+          echo "        - .wordlist.txt" >> .spelling.yml
+          echo "      output: .wordlist.dic" >> .spelling.yml
+          echo "    pipeline:" >> .spelling.yml
+          echo "      - pyspelling.filters.context:" >> .spelling.yml
+          echo "          context_visible_first: true" >> .spelling.yml
+          echo "          delimiters:" >> .spelling.yml
+          echo "            - open: '\\\\[a-zA-Z@]+'" >> .spelling.yml
+          echo "              close: '(?=[^a-zA-Z@])'" >> .spelling.yml
+          echo "            - open: '\\\\begin\\{[^}]*\\}'" >> .spelling.yml
+          echo "              close: '\\\\end\\{[^}]*\\}'" >> .spelling.yml
+          echo "            - open: '\\$(?!\\$)'" >> .spelling.yml
+          echo "              close: '\\$(?!\\$)'" >> .spelling.yml
+          echo "            - open: '\\$\\$'" >> .spelling.yml
+          echo "              close: '\\$\\$'" >> .spelling.yml
+          echo "            - open: '%'" >> .spelling.yml
+          echo "              close: '\\n'" >> .spelling.yml
+          
       - name: Create Default Wordlist (Optional)
         run: |
           echo "DFP" > .wordlist.txt
