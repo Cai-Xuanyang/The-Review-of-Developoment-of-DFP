@@ -49,7 +49,7 @@ jobs:
           sudo apt-get install -y aspell aspell-en
           # sudo apt-get install -y hunspell-en-us
 
-            - name: Create Spell Check Config
+      - name: Create Spell Check Config
         run: |
           cat > .spelling.yml <<EOF
           matrix:
@@ -57,7 +57,7 @@ jobs:
             sources:
             - '**/*.md'
             - '**/*.txt'
-            - '**/*.tex'  
+            - '**/*.tex'
             dictionary:
               wordlists:
               - .wordlist.txt
@@ -65,7 +65,7 @@ jobs:
             pipeline:
             - pyspelling.filters.context:
                 context_visible_first: true
-                delimiters
+                delimiters:
                 - open: '\\\\begin\\{.*?\\}'
                   close: '\\\\end\\{.*?\\}'
                 - open: '\\\\[a-zA-Z]+\\*?\\{[^}]*\\}'
