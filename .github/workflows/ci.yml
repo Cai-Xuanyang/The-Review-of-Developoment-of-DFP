@@ -68,12 +68,12 @@ jobs:
                 delimiters:
                 - open: '\\\\begin\\{.*?\\}'
                   close: '\\\\end\\{.*?\\}'
-                - open: '\\\\[a-zA-Z]+\\*?\\{[^}]*\\}'
-                - open: '\\\\[a-zA-Z]+\\*?\\[[^\\]]*\\]\\{[^}]*\\}'
                 - open: '\\$'
                   close: '\\$'
                 - open: '\\$\\$'
                   close: '\\$\\$'
+                - open: '\\\\\\['
+                  close: '\\\\\\]'
           EOF
 
       - name: Create Default Wordlist (Optional)
