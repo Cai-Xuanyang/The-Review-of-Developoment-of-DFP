@@ -41,9 +41,13 @@ jobs:
 
       - name: Install pyspelling and dependencies
         run: |
+          echo "Installing pyspelling..."
           pip install pyspelling
+          
+          echo "Installing aspell and dictionaries..."
           sudo apt-get update
-          sudo apt-get install -y hunspell-en-us
+          sudo apt-get install -y aspell aspell-en
+          # sudo apt-get install -y hunspell-en-us
 
       - name: Create Spell Check Config
         run: |
