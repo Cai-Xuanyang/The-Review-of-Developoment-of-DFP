@@ -1,0 +1,341 @@
+\documentclass[11pt,hyperref={pdfpagelabels=false}]{beamer}
+\usepackage{ctex} % 中文支持
+\usepackage{amsmath, amssymb, bm}
+\usepackage{graphicx}
+\usepackage{booktabs} % 用于高质量的表格
+\usepackage{multirow}
+
+% 主题设置
+\usetheme{Madrid}
+\usecolortheme{default}
+\usefonttheme{professionalfonts}
+
+% 颜色定义
+\definecolor{myblue}{RGB}{0, 51, 102}
+\definecolor{mygreen}{RGB}{0, 100, 0}
+\setbeamercolor{structure}{fg=myblue}
+
+% 标题信息
+\title[DFP算法发展综述]{Davidon–Fletcher–Powell (DFP) 算法发展综述}
+\subtitle{从理论危机到现代前沿}
+\author[蔡轩扬]{蔡轩扬}
+\date{2026年4月}
+
+\begin{document}
+
+% 封面
+\begin{frame}
+    \titlepage
+\end{frame}
+
+% 目录
+\begin{frame}{目录}
+    \tableofcontents[hideallsubsections]
+\end{frame}
+
+%==================================================================================
+% 第一部分：引言
+%==================================================================================
+\section{1. 引言：黄金标准与理论鸿沟}
+
+\begin{frame}{1.1 DFP算法的历史地位}
+    \begin{itemize}
+        \item \textbf{历史地位}：DFP 算法（Davidon, 1959; Fletcher \& Powell, 1963）是历史上第一个拟牛顿法。
+        \item \textbf{核心机制}：仅利用梯度信息构建 Hessian 矩阵的逆的近似 $H_k$。
+        \item \textbf{早期辉煌}：
+        \begin{itemize}
+            \item 在20世纪后半叶，DFP 是无约束优化的“金标准”。
+            \item 数值实验显示其鲁棒性极高，尤其在中等维度问题上常优于 BFGS。
+        \end{itemize}
+        \item \textbf{理论假设}：早期理论依赖于 \textbf{精确线搜索}（Exact Line Search）。
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{1.2 理论与实践的脱节}
+    \begin{columns}
+        \column{0.5\textwidth}
+        \textbf{理想世界 (Exact Search)}
+        \begin{itemize}
+            \item 假设 $\alpha_k$ 精确最小化目标函数。
+            \item Powell (1971) 证明：对于严格凸函数，算法全局收敛且超线性收敛。
+            \item Hessian 近似矩阵 $H_k$ 保持有界且正定。
+        \end{itemize}
+
+        \column{0.5\textwidth}
+        \textbf{现实世界 (Inexact Search)}
+        \begin{itemize}
+            \item 实际中无法进行精确线搜索。
+            \item 普遍使用 \textbf{Wolfe 条件} (1978)：
+            \begin{equation*}
+                \begin{aligned}
+                    f(x_k + \alpha d_k) &\le f(x_k) + c_1 \alpha g_k^T d_k \\
+                    g_{k+1}^T d_k &\ge c_2 g_k^T d_k
+                \end{aligned}
+            \end{equation*}
+            \item 理论基础在此处崩塌。
+        \end{itemize}
+    \end{columns}
+    \vspace{0.5cm}
+    \begin{alertblock}{核心矛盾}
+        为什么数值表现优异的 DFP，在理论上无法保证在 Wolfe 线搜索下收敛？
+    \end{alertblock}
+\end{frame}
+
+%==================================================================================
+% 第二部分：理论危机
+%==================================================================================
+\section{2. 源：Powell 反例与理论危机}
+
+
+\begin{frame}{2.1 DFP 算法原理与更新公式}
+    \textbf{核心思想}：利用梯度信息构造 Hessian 矩阵逆的近似 $H_k \approx [\nabla^2 f(x_k)]^{-1}$。
+
+    \vspace{0.3cm}
+    \begin{block}{迭代格式}
+        \begin{equation*}
+            x_{k+1} = x_k + \alpha_k d_k, \quad \text{其中搜索方向 } d_k = -H_k \nabla f(x_k)
+        \end{equation*}
+        $\alpha_k$ 通过线搜索（如 Wolfe 条件）确定。
+    \end{block}
+
+    \vspace{0.3cm}
+    \begin{columns}
+        \column{0.5\textwidth}
+        \textbf{符号定义}：
+        \begin{itemize}
+            \item $s_k = x_{k+1} - x_k$ (位移)
+            \item $y_k = \nabla f(x_{k+1}) - \nabla f(x_k)$ (梯度差)
+        \end{itemize}
+        \vspace{0.2cm}
+        \textbf{拟牛顿方程}：
+        \begin{equation*}
+            H_{k+1} y_k = s_k
+        \end{equation*}
+
+        \column{0.5\textwidth}
+        \textbf{DFP 更新公式}：
+        \begin{equation*}
+            H_{k+1} = H_k - \underbrace{\frac{H_k y_k y_k^T H_k}{y_k^T H_k y_k}}_{\text{修正项 1}} + \underbrace{\frac{s_k s_k^T}{y_k^T s_k}}_{\text{修正项 2}}
+        \end{equation*}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{2.1 Powell 的毁灭性反例 (1984-1986)}
+    \begin{itemize}
+        \item \textbf{背景}：M.J.D. Powell 在 1980 年代构造了著名的反例 [2, 3]。
+        \item \textbf{反例构造}：
+        \begin{itemize}
+            \item 构造了一个 $\mathbb{R}^2$ 上的严格凸函数。
+            \item 设计了满足 Wolfe 条件的步长序列。
+        \end{itemize}
+        \item \textbf{结果}：迭代点未能收敛到驻点，而是发散或停滞。
+        \item \textbf{机制分析}：Wolfe 条件允许 $y_k^T d_k$ 变得非常小。在 DFP 更新公式中：
+            \begin{equation*}
+                H_{k+1} = H_k - \frac{H_k y_k y_k^T H_k}{y_k^T H_k y_k} + \frac{d_k d_k^T}{y_k^T d_k}
+            \end{equation*}
+            分母 $y_k^T d_k \to 0$ 会导致 $H_k$ 的特征值爆炸或变为奇异，破坏算法。
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{2.2 十年的僵局 (Impasse)}
+    \begin{columns}
+        \column{0.6\textwidth}
+        \begin{itemize}
+            \item Powell 的反例揭示了 DFP 在非精确搜索下的致命缺陷。
+            \item \textbf{困惑}：是算法本身有缺陷，还是只是缺乏发现收敛条件的工具？
+            \item \textbf{尝试与失败}：
+            \begin{itemize}
+                \item 调整 Wolfe 参数 $c_1, c_2$ 无效。
+                \item 修改更新公式（如阻尼法）虽然有效，但牺牲了超线性收敛速度。
+            \end{itemize}
+            \item \textbf{遗留问题}：是否存在一类函数和线搜索条件，能保证标准 DFP 收敛？
+        \end{itemize}
+
+        \column{0.4\textwidth}
+        \begin{block}{Powell 反例的核心}
+            \centering
+            \textbf{Hessian 逆近似矩阵 $H_k$ 无界}
+        \end{block}
+        \begin{figure}
+            \vspace{-0.3cm}
+            % \includegraphics[width=\linewidth]{placeholder.jpg} % 此处可插入反例示意图
+            % \caption{Powell 反例中的迭代路径}
+        \end{figure}
+    \end{columns}
+\end{frame}
+
+%==================================================================================
+% 第三部分：突破
+%==================================================================================
+\section{3. 流：Yuan 1995 突破与范式转移}
+
+\begin{frame}{3.1 转折点：袁亚湘 (1995) [1]}
+    \begin{itemize}
+        \item \textbf{里程碑}：袁亚湘在 1995 年发表论文《Convergence of DFP algorithm》。
+        \item \textbf{核心贡献}：证明了在 \textbf{一致凸函数} (Uniformly Convex) 下，配合 Wolfe 线搜索，DFP 具有全局收敛性。
+        \item \textbf{关键洞察}：如果函数的曲率有正的下界（即 $m > 0$），DFP 的更新机制具有自修正能力，能防止 $H_k$ 发散。
+    \end{itemize}
+    \begin{block}{定理 3.1 (Yuan, 1995)}
+        若 $f$ 一致凸（$\exists m, M > 0$ 使得 $mI \preceq \nabla^2 f(x) \preceq MI$），且步长满足 Wolfe 条件，则：
+        \begin{enumerate}
+            \item 序列 $\{x_k\}$ 满足 $\liminf \|\nabla f(x_k)\| = 0$。
+            \item $H_k$ 的条件数保持一致有界。
+            \item 若收敛，收敛速度为超线性。
+        \end{enumerate}
+    \end{block}
+\end{frame}
+
+\begin{frame}{3.2 方法论创新：势函数分析 (Potential Function)}
+    \begin{itemize}
+        \item \textbf{旧方法的局限}：试图直接估计 $\|H_k\|$ 或 $\|H_k^{-1}\|$ 的递推不等式失败了。
+        \item \textbf{新工具}：袁引入了势函数 $\phi(H)$ 来同时控制矩阵的迹 (Trace) 和行列式 (Determinant)：
+            \begin{equation*}
+                \phi(H) = \text{tr}(H) - \ln(\det(H))
+            \end{equation*}
+        \item \textbf{势函数的性质}：
+        \begin{itemize}
+            \item \textbf{壁垒性质}：当任意特征值 $\lambda_i \to 0^+$ 或 $\lambda_i \to +\infty$ 时，$\phi(H) \to +\infty$。
+            \item \textbf{最小值}：当 $H=I$ 时取最小值，衡量了 $H$ 偏离良态的程度。
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{3.3 递推不等式与有界性证明}
+    \textbf{证明思路：}
+    \begin{enumerate}
+        \item \textbf{更新分析}：利用 DFP 公式，推导 $\Delta \phi_k = \phi(H_{k+1}) - \phi(H_k)$。
+        \item \textbf{关键不等式}：利用 Wolfe 条件和一致凸性，证明存在常数 $C_1, C_2 > 0$，使得：
+            \begin{equation*}
+                \Delta \phi_k \le C_1 - C_2 \frac{\|g_k\|^2}{g_k^T H_k g_k}
+            \end{equation*}
+        \item \textbf{求和与矛盾}：
+            \begin{equation*}
+                \phi(H_{N+1}) - \phi(H_0) \le \sum_{k=0}^N (C_1 - C_2 \frac{\|g_k\|^2}{g_k^T H_k g_k})
+            \end{equation*}
+        \item \textbf{结论}：如果 $\|g_k\|$ 不趋于 0，右边的负项会驱动 $\phi(H_k)$ 趋于 $-\infty$，这与势函数的下界性质矛盾。
+        \item 因此，$\phi(H_k)$ 必须有界 $\implies$ $H_k$ 的特征值有界 $\implies$ 全局收敛。
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{3.4 范式转移与后续发展 (1995-2010)}
+    \begin{itemize}
+        \item \textbf{理论统一}：势函数方法成为拟牛顿法分析的标准工具箱。
+        \item \textbf{凸性假设的放松}：
+        \begin{itemize}
+            \item \textbf{Dai \& Yuan (2003)}：证明了对于一般凸函数（$m=0$），标准 DFP 确实可能失败。验证了 Yuan 假设的必要性。
+            \item \textbf{修正算法}：提出了正则化 DFP 或混合 Broyden 族方法。
+        \end{itemize}
+        \item \textbf{BFGS vs DFP}：
+        \begin{itemize}
+            \item BFGS 被证明在一般凸函数下更稳定（不需要一致凸假设）。
+            \item DFP 在 Hessian 特征值聚集的问题上表现优异。
+        \end{itemize}
+    \end{itemize}
+    \begin{table}[]
+        \begin{tabular}{lcc}
+        \toprule
+        \textbf{特性} & \textbf{DFP} & \textbf{BFGS} \\
+        \midrule
+        全局收敛 (一般凸) & 否 (需一致凸) & 是 \\
+        对病态问题的鲁棒性 & 较弱 & 强 \\
+        历史地位 & 第一个拟牛顿法 & 现代标准 \\
+        \bottomrule
+        \end{tabular}
+    \end{table}
+\end{frame}
+
+%==================================================================================
+% 第四部分：前沿
+%==================================================================================
+\section{4. 前沿：大数据时代的复兴与挑战}
+
+\begin{frame}{4.1 随机拟牛顿法 (Stochastic Quasi-Newton)}
+    \begin{itemize}
+        \item \textbf{背景}：机器学习中目标函数为期望形式 $f(x) = \mathbb{E}[F(x, \xi)]$，梯度含噪。
+        \item \textbf{挑战}：确定性的 Wolfe 条件不再成立，噪声可能导致 $H_k$ 不稳定。
+        \item \textbf{新理论方向}：
+        \begin{itemize}
+            \item \textbf{随机 Wolfe 条件}：以高概率满足的条件。
+            \item \textbf{鞅分析}：结合 Yuan 的势函数与鞅收敛理论。
+            \item \textbf{方差缩减}：结合 SVRG 等技术，使噪声 $\sigma_k^2$ 减小，从而保证 $\mathbb{E}[\phi(H_k)]$ 有界。
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{4.2 非凸优化与鞍点逃逸}
+    \begin{itemize}
+        \item \textbf{背景}：深度学习损失函数高度非凸，充满鞍点。
+        \item \textbf{DFP 的新角色}：拟牛顿法天然包含曲率信息。
+        \item \textbf{问题}：标准 DFP 假设 $y_k^T d_k > 0$（正曲率）。在非凸区，这可能不成立，导致 $H_k$ 破坏正定性。
+        \item \textbf{解决方案}：
+        \begin{itemize}
+            \item \textbf{修改更新}：当检测到负曲率时，跳过更新或应用阻尼修正。
+            \item \textbf{利用负曲率}：设计算法利用 $H_k$ 生成的负曲率方向加速逃离鞍点。
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{4.3 现代视角下的 DFP 价值}
+    \begin{columns}
+        \column{0.5\textwidth}
+        \textbf{理论价值}
+        \begin{itemize}
+            \item 势函数分析法是现代优化分析的基石。
+            \item 为理解拟牛顿法的稳定性提供了数学语言。
+        \end{itemize}
+
+        \column{0.5\textwidth}
+        \textbf{应用价值}
+        \begin{itemize}
+            \item \textbf{预处理}：在共轭梯度法中作为预处理器。
+            \item \textbf{特定架构}：在 Hessian 特征值聚集的机器学习模型中仍有优势。
+            \item \textbf{受限内存变体}：L-DFP 在特定场景下的探索。
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+%==================================================================================
+% 结论
+%==================================================================================
+\section{5. 结论}
+
+\begin{frame}{5.1 总结：从危机到基石}
+    \begin{itemize}
+        \item \textbf{源 (The Source)}：Powell 反例揭示了 DFP 在非精确搜索下的脆弱性，引发了长达十年的理论危机。
+        \item \textbf{流 (The Flow)}：袁亚湘 (1995) 利用 \textbf{势函数} $\phi(H) = \text{tr}(H) - \ln \det(H)$ 证明了一致凸函数下的全局收敛性，确立了现代分析范式。
+        \item \textbf{前沿 (The Frontier)}：该理论框架正在被扩展至随机优化和非凸优化领域，指导新一代算法的设计。
+    \end{itemize}
+    \vspace{0.5cm}
+    \begin{center}
+        \textbf{DFP 的遗产不在于算法本身，而在于为驯服它而锻造的数学工具。}
+    \end{center}
+\end{frame}
+
+% 参考文献
+\begin{frame}[allowframebreaks]{参考文献}
+    \footnotesize
+    \begin{thebibliography}{10}
+        \bibitem{Yuan1995} 
+        [1] Y. Yuan. Convergence of DFP algorithm. \emph{Science in China (Series A)}, 38(8):912–920, 1995.
+        
+        \bibitem{Powell1984} 
+        [2] M. J. D. Powell. On the convergence of the DFP algorithm for unconstrained optimization when there are only two variables. \emph{Mathematical Programming Study}, 22:1–17, 1984.
+        
+        \bibitem{Powell1986} 
+        [3] M. J. D. Powell. How bad are the BFGS and DFP methods when the objective function is quadratic? \emph{Mathematical Programming}, 34(1):34–47, 1986.
+        
+        \bibitem{DaiYuan2003} 
+        [4] Y. H. Dai and Y. Yuan. Convergence properties of the BFGS method with the Wolfe line search. \emph{SIAM Journal on Optimization}, 13(3):693–701, 2003.
+        
+        \bibitem{LiFukushima2001} 
+        [5] D. H. Li and M. Fukushima. On the global convergence of the BFGS method for nonconvex unconstrained optimization problems. \emph{SIAM Journal on Optimization}, 11(4):1054–1070, 2001.
+        
+        \bibitem{Byrd2016} 
+        [6] R. H. Byrd, et al. A stochastic quasi-Newton method for large-scale optimization. \emph{SIAM Journal on Optimization}, 26(2):1008–1031, 2016.
+        
+        \bibitem{Moritz2016} 
+        [7] P. Moritz, et al. A linearly-convergent stochastic L-BFGS algorithm. \emph{AISTATS}, 2016.
+    \end{thebibliography}
+\end{frame}
+
+\end{document}

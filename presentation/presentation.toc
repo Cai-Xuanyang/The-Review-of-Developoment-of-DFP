@@ -1,0 +1,5 @@
+\beamer@sectionintoc {1}{1. 引言：黄金标准与理论鸿沟}{3}{0}{1}
+\beamer@sectionintoc {2}{2. 源：Powell 反例与理论危机}{5}{0}{2}
+\beamer@sectionintoc {3}{3. 流：Yuan 1995 突破与范式转移}{8}{0}{3}
+\beamer@sectionintoc {4}{4. 前沿：大数据时代的复兴与挑战}{12}{0}{4}
+\beamer@sectionintoc {5}{5. 结论}{15}{0}{5}
